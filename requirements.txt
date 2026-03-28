@@ -1,4 +1,3 @@
 aiogram
-whisper
+openai-whisper
 torch
-pydub
