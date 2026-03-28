@@ -5,15 +5,15 @@ import subprocess
 import whisper
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram import F  # магический фильтр
+from aiogram import F
 
-# Токен берётся из переменных окружения (задаётся на Render)
-API_TOKEN = os.getenv("API_TOKEN")
-if not API_TOKEN:
-    raise ValueError("API_TOKEN environment variable not set")
+# ========== ТОКЕН ==========
+API_TOKEN = "8722750200:AAHsZb366IwNVvNXGBROJhcr0ErLarVHqqA"  # ваш токен
+# ===========================
 
 MODEL_SIZE = "tiny"
 TEMP_DIR = "temp"
+FFMPEG_PATH = os.path.join(os.path.dirname(__file__), "ffmpeg")  # путь к локальному ffmpeg
 
 os.makedirs(TEMP_DIR, exist_ok=True)
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +27,7 @@ print("✅ Модель загружена! Бот готов.")
 
 def convert_ogg_to_wav(ogg_path: str, wav_path: str) -> bool:
     try:
-        cmd = ["ffmpeg", "-i", ogg_path, "-acodec", "pcm_s16le", "-ar", "16000", wav_path, "-y"]
+        cmd = [FFMPEG_PATH, "-i", ogg_path, "-acodec", "pcm_s16le", "-ar", "16000", wav_path, "-y"]
         subprocess.run(cmd, check=True, capture_output=True)
         return True
     except Exception as e:
@@ -63,11 +63,12 @@ async def handle_voice(message: types.Message):
 
         wav_path = os.path.join(TEMP_DIR, f"{message.message_id}.wav")
         if not convert_ogg_to_wav(ogg_path, wav_path):
-            await processing_msg.edit_text("❌ Ошибка конвертации. Убедитесь, что установлен ffmpeg.")
+            await processing_msg.edit_text("❌ Ошибка конвертации. Проверьте ffmpeg.")
             return
 
         text = transcribe_audio(wav_path, language="ru")
 
+        # Удаляем временные файлы
         if os.path.exists(ogg_path):
             os.remove(ogg_path)
         if os.path.exists(wav_path):
