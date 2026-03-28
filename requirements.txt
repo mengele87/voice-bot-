@@ -1,3 +1,4 @@
 aiogram
 openai-whisper
 torch
+aiohttp
