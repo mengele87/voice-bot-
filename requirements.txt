@@ -1,4 +1,4 @@
-aiogram
-openai-whisper
 torch
 aiohttp
+aiogram
+openai-whisper
