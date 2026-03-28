@@ -1,0 +1,4 @@
+aiogram
+whisper
+torch
+pydub
