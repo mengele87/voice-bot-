@@ -1,3 +1,6 @@
+from aiohttp import web
+async def handle(request):
+    return web.Response(text="Bot is running")
 import os
 import asyncio
 import logging
@@ -84,6 +87,17 @@ async def handle_voice(message: types.Message):
         await processing_msg.edit_text("❌ Произошла ошибка. Попробуйте ещё раз.")
 
 async def main():
+    # Запускаем веб-сервер на порту, который задаёт Render
+    port = int(os.environ.get("PORT", 8000))
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"✅ Веб-сервер запущен на порту {port}")
+
+    # Запускаем polling бота
     await dp.start_polling(bot, skip_updates=True)
 
 if __name__ == "__main__":
